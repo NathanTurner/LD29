@@ -12,6 +12,7 @@ function preload() {
 var player;
 
 function create() {
+    game.stage.backgroundColor = '#202040';
     game.physics.startSystem(Phaser.Physics.ARCADE);
     game.world.setBounds(0, 0, 800, 600);
     cursors = game.input.keyboard.createCursorKeys();
