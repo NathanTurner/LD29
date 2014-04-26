@@ -38,16 +38,20 @@ function create() {
     jets = game.add.group();
     jets.enableBody = true;
     jets.physicsBodyType = Phaser.Physics.ARCADE;
-    createJet();
+
+    game.time.events.repeat(Phaser.Timer.SECOND * 2, 4, createJet, this);
 }
 
 function createJet() {
     var jet = game.add.sprite(game.width, 50+game.rnd.integerInRange(0, 200), 'jet');
+    jet.outOfBoundsKill = true;
+    jet.checkWorldBounds = true;
 
     game.add.tween(jet).to({ x: jet.x - 1600 }, 10000, Phaser.Easing.Linear.None, true);
     game.add.tween(jet).to({ y: jet.y + 20 }, 1000, Phaser.Easing.Linear.None, true, 0, Number.MAX_VALUE, true);
     jet.scale.setTo(0.3, 0.3);
     jets.add(jet);
+    jet.events.onKilled.add(createJet, this);
 }
 
 
@@ -110,6 +114,5 @@ function render() {
 function collisionHandler (shark, jet)
 {
     jet.kill();
-    createJet();
     score += 1;
 }
