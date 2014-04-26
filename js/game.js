@@ -13,6 +13,7 @@ function preload() {
 
 var player;
 var jets;
+var score = 0;
 
 function create() {
     game.stage.backgroundColor = '#202040';
@@ -105,10 +106,12 @@ function update() {
 }
 
 function render() {
+    game.debug.text('Score: ' + score, 32, 32)
 }
 
 function collisionHandler (shark, jet)
 {
     jet.kill();
     createJet();
+    score += 1;
 }
