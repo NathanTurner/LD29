@@ -10,6 +10,7 @@ function preload() {
 }
 
 var player;
+var jets;
 
 function create() {
     game.stage.backgroundColor = '#202040';
@@ -22,6 +23,9 @@ function create() {
     player.scale.setTo(0.5,0.5);
     game.physics.enable(player, Phaser.Physics.ARCADE);
 
+    jets = game.add.group();
+    jets.enableBody = true;
+    jets.physicsBodyType = Phaser.Physics.ARCADE;
     createJet();
 }
 
@@ -32,9 +36,14 @@ function createJet() {
 
     game.add.tween(jet).to({ x: jet.x - 1600 }, 10000, Phaser.Easing.Linear.None, true);
     game.add.tween(jet).to({ y: jet.y + 20 }, 1000, Phaser.Easing.Linear.None, true, 0, Number.MAX_VALUE, true);
+
+    jets.add(jet);
 }
 
+
 function update() {
+    game.physics.arcade.overlap(player, jets, collisionHandler, null, this);
+
     //  Reset the player, then check for movement keys
     player.body.velocity.setTo(0, 0);
     player.body.angularVelocity = 0;
@@ -51,4 +60,10 @@ function update() {
     {
         player.body.angularVelocity = 300;
     }
+}
+
+function collisionHandler (shark, jet)
+{
+    jet.kill();
+    createJet();
 }
