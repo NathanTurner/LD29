@@ -29,8 +29,9 @@ function createJet() {
     var jet = game.add.sprite(game.width, 50+game.rnd.integerInRange(0, 200), 'jet');
     var cropRect = {x: 0, y: 0, width: jet.width, height: 35};
     jet.crop(cropRect);
-    var jetTween = game.add.tween(jet);
-    jetTween.to({ x: game.width + (1600 + jet.x) }, 10000, Phaser.Easing.Linear.None, true);
+
+    game.add.tween(jet).to({ x: jet.x - 1600 }, 10000, Phaser.Easing.Linear.None, true);
+    game.add.tween(jet).to({ y: jet.y + 20 }, 1000, Phaser.Easing.Linear.None, true, 0, Number.MAX_VALUE, true);
 }
 
 function update() {
