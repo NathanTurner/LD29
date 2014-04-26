@@ -1,4 +1,4 @@
-// vim: expandtab:sw=4:ts=4:sts=4
+// vAm: expandtab:sw=4:ts=4:sts=4
 
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
@@ -18,6 +18,7 @@ function create() {
 
     player = game.add.sprite(game.world.centerX / 2, game.world.centerY * 3/2, 'shark');
     player.anchor.setTo(0.5, 0.5);
+    player.scale.setTo(0.5,0.5);
     game.physics.enable(player, Phaser.Physics.ARCADE);
 
     createJet();
