@@ -7,7 +7,7 @@ var SHARK_SPEED = 10;
 
 function preload() {
     game.load.image('shark', SPRITE_DIR + 'shark.png');
-    game.load.image('jet',   SPRITE_DIR + 'jet.svg');
+    game.load.image('jet',   SPRITE_DIR + 'jet.png');
     game.load.image('water', SPRITE_DIR + 'bg.png');
 }
 
@@ -43,12 +43,10 @@ function create() {
 
 function createJet() {
     var jet = game.add.sprite(game.width, 50+game.rnd.integerInRange(0, 200), 'jet');
-    var cropRect = {x: 0, y: 0, width: jet.width, height: 35};
-    jet.crop(cropRect);
 
     game.add.tween(jet).to({ x: jet.x - 1600 }, 10000, Phaser.Easing.Linear.None, true);
     game.add.tween(jet).to({ y: jet.y + 20 }, 1000, Phaser.Easing.Linear.None, true, 0, Number.MAX_VALUE, true);
-
+    jet.scale.setTo(0.3, 0.3);
     jets.add(jet);
 }
 
