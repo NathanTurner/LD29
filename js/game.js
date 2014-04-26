@@ -1,4 +1,4 @@
-// vAm: expandtab:sw=4:ts=4:sts=4
+// vim: expandtab:sw=4:ts=4:sts=4
 
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
