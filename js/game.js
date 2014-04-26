@@ -51,7 +51,10 @@ function createJet() {
     game.add.tween(jet).to({ y: jet.y + 20 }, 1000, Phaser.Easing.Linear.None, true, 0, Number.MAX_VALUE, true);
     jet.scale.setTo(0.3, 0.3);
     jets.add(jet);
-    jet.events.onKilled.add(createJet, this);
+    jet.events.onKilled.add(function(){
+            var rT = game.rnd.integerInRange(2,6);
+            game.time.events.add(Phaser.Timer.SECOND*rT, createJet, this);
+    }, this);
 }
 
 
