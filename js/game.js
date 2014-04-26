@@ -18,6 +18,8 @@ function create() {
     game.stage.backgroundColor = '#202040';
     game.physics.startSystem(Phaser.Physics.ARCADE);
     game.world.setBounds(0, 0, 928, 600);
+    game.scale.pageAlignHorizontally = true;
+    game.scale.refresh();
     cursors = game.input.keyboard.createCursorKeys();
     cursors.w = game.input.keyboard.addKey(Phaser.Keyboard.W);
     cursors.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
