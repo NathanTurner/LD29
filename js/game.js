@@ -212,7 +212,7 @@ function scoreCombo(comboScore)
         var style = { font: "65px Arial", fill: "#eeddbb", align: "center" };
         comboText.setStyle(style);
         game.add.tween(comboText).to({alpha: 0}, 500*comboScore, Phaser.Easing.Linear.None, true);
-        game.add.tween(comboText).to({angle: 360}, 2000, Phaser.Easing.Linear.None, true);
+        game.add.tween(comboText).to({angle: 360}, 1500, Phaser.Easing.Bounce.Out, true);
         score += (Math.pow(comboScore,2)-currentComboScore)
     }
 }
