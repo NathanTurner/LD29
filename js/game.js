@@ -12,7 +12,6 @@ function preload() {
     game.load.image('jet',      SPRITE_DIR + 'jet.png');
     game.load.image('bomb',     SPRITE_DIR + 'bomb.png');
     game.load.image('waves',    SPRITE_DIR + 'waves.png');
-    game.load.image('smoke',    SPRITE_DIR + 'smoke.png');
     game.load.atlas('speaker',  SPRITE_DIR + 'speaker.png', null, speakerData);
 
     //sound effects
