@@ -8,10 +8,11 @@ var SHARK_SPEED = 10;
 
 function preload() {
     //images
-    game.load.image('shark', SPRITE_DIR + 'shark.png');
-    game.load.image('jet',   SPRITE_DIR + 'jet.png');
-    game.load.image('waves', SPRITE_DIR + 'waves.png');
-    
+    game.load.image('shark',    SPRITE_DIR + 'shark.png');
+    game.load.image('jet',      SPRITE_DIR + 'jet.png');
+    game.load.image('waves',    SPRITE_DIR + 'waves.png');
+    game.load.atlas('speaker',  SPRITE_DIR + 'speaker.png', null, speakerData);
+
     //sound effects
     game.load.audio('jet_explode',      AUDIO_DIR + 'jet_explode.wav');
     game.load.audio('jump_out_of_ocean',AUDIO_DIR + 'jump_out_of_ocean.wav');
@@ -30,6 +31,7 @@ var jetCounter = 0;
 var score = 0;
 var currentComboScore = 0;
 var maxCombo = 0;
+var mute = false;
 
 function create() {
     game.stage.backgroundColor = '#3399FF';
@@ -42,6 +44,18 @@ function create() {
     splash_sfx = game.add.audio('splash_down', 1);
     music = game.add.audio('bgmusic',1,true);
     music.play('',0,1,true);
+    speaker = game.add.sprite(game.width - 32, game.height - 32, 'speaker');
+    speaker.inputEnabled = true;
+    speaker.events.onInputDown.add(function() {
+        mute = !mute;
+        speaker.frame = mute ? 1 : 0;
+        if (mute) {
+            music.pause();
+        } else {
+            music.resume();
+        }
+    }, this);
+    //speaker.animations.play('toggle', 1, false);
     cursors = game.input.keyboard.createCursorKeys();
     cursors.w = game.input.keyboard.addKey(Phaser.Keyboard.W);
     cursors.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
@@ -63,6 +77,7 @@ function create() {
     comboText = game.add.text(game.world.centerX-80, 128, 'Combo ' + currentComboScore, style);
     comboText.alpha = 0;
     comboText.anchor.setTo(0.5,0.5);
+    speaker.bringToTop();
 }
 
 function createJet()
@@ -87,9 +102,8 @@ function update() {
     }
     player.body.angularVelocity = 0;
     if (player.body.y > 300) {
-        if (player.aboveWater)
-        {
-            splash_sfx.play('');
+        if (player.aboveWater) {
+            playSound(splash_sfx,'');
         }
         player.aboveWater = false;
         scoreCombo(currentComboScore);
@@ -129,7 +143,7 @@ function update() {
     else
     {
         if (!player.aboveWater) {
-            shark_jump_sfx.play('');
+            playSound(shark_jump_sfx, '');
         }
         player.aboveWater = true;
         player.angle += 1 * (player.angle - 75 < 0)
@@ -164,7 +178,7 @@ function sharkHitJet(shark, jet) {
     var destroyed = jets[jet.name].damage();
     if (destroyed)
     {
-        jet_explode_sfx.play('');
+        playSound(jet_explode_sfx, '');
         score += 1;
         currentComboScore += 1;
         if(currentComboScore > maxCombo)
@@ -178,3 +192,30 @@ function render() {
     game.debug.text('Score: ' + score, 32, 32)
     game.debug.text('Max Combo: ' + maxCombo, 32, 64)
 }
+
+function playSound(sound, marker) {
+    if (!mute) {
+        sound.play(marker);
+    }
+}
+
+var speakerData = {
+    "frames": [
+        {
+            "filename": "speakerOn",
+            "frame": { "x": 0, "y": 0, "w": 20, "h": 20 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize":  { "x": 0, "y": 0, "w": 20, "h": 20 },
+            "sourceSize": { "w": 20, "h": 20 }
+        },
+        {
+            "filename": "speakerOff",
+            "frame": { "x": 20, "y": 0, "w": 20, "h": 20 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize":  { "x": 0, "y": 0, "w": 32, "h": 32 },
+            "sourceSize": { "w": 20, "h": 20 }
+        }
+    ]
+};
