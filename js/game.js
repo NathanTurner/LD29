@@ -3,20 +3,26 @@
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render });
 
 var SPRITE_DIR = 'assets/sprites/';
+var AUDIO_DIR = 'assets/audio/';
 var SHARK_SPEED = 10;
 
 function preload() {
     game.load.image('shark', SPRITE_DIR + 'shark.png');
     game.load.image('jet',   SPRITE_DIR + 'jet.png');
-    game.load.image('water', SPRITE_DIR + 'bg.png');
+    game.load.image('water', SPRITE_DIR + 'waves.png');
+
+    game.load.audio('jet_explode',   AUDIO_DIR + 'jet_explode.wav');
 }
 
 var player;
-var jets;
+var jets = [];
+var comboText;
+var enemyProjectiles;
+var jet_explode_sfx;
+var jetCounter = 0;
 var score = 0;
 var currentComboScore = 0;
 var maxCombo = 0;
-var comboText;
 
 function create() {
     game.stage.backgroundColor = '#202040';
@@ -24,6 +30,8 @@ function create() {
     game.world.setBounds(0, 0, 928, 600);
     game.scale.pageAlignHorizontally = true;
     game.scale.refresh();
+    jet_explode_sfx = game.add.audio('jet_explode');
+    jet_explode_sfx.addMarker('explode', 0, 1.0);
     cursors = game.input.keyboard.createCursorKeys();
     cursors.w = game.input.keyboard.addKey(Phaser.Keyboard.W);
     cursors.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
@@ -38,10 +46,7 @@ function create() {
 
     game.physics.enable(player, Phaser.Physics.ARCADE);
     player.body.maxVelocity.setTo(300, 1000);
-
-    jets = game.add.group();
-    jets.enableBody = true;
-    jets.physicsBodyType = Phaser.Physics.ARCADE;
+    enemyProjectiles = game.add.group();
 
     game.time.events.repeat(Phaser.Timer.SECOND * 2, 4, createJet, this);
     style = { font: "65px Arial", fill: "#eeddbb", align: "center" };
@@ -50,24 +55,26 @@ function create() {
     comboText.anchor.setTo(0.5,0.5);
 }
 
-function createJet() {
-    var jet = game.add.sprite(game.width, 50+game.rnd.integerInRange(0, 200), 'jet');
-    jet.outOfBoundsKill = true;
-    jet.checkWorldBounds = true;
-
-    game.add.tween(jet).to({ x: jet.x - 1600 }, 10000, Phaser.Easing.Linear.None, true);
-    game.add.tween(jet).to({ y: jet.y + 20 }, 1000, Phaser.Easing.Linear.None, true, 0, Number.MAX_VALUE, true);
-    jet.scale.setTo(0.3, 0.3);
-    jets.add(jet);
-    jet.events.onKilled.add(function(){
-            var rT = game.rnd.integerInRange(2,6);
-            game.time.events.add(Phaser.Timer.SECOND*rT, createJet, this);
-    }, this);
+function createJet()
+{
+    jets[jetCounter.toString()] = new Jet(jetCounter, game, player, enemyProjectiles);
+    jetCounter++;
 }
 
-
 function update() {
-    game.physics.arcade.overlap(player, jets, collisionHandler, null, this);
+
+    for (i in jets)
+    {
+        if (jets[i].alive)
+        {
+            jets[i].update();
+            game.physics.arcade.overlap(player, jets[i].jet, sharkHitJet, null, this);
+        }
+        else
+        {
+            delete jets[i];
+        }
+    }
     player.body.angularVelocity = 0;
     if (player.body.y > 300) { 
         player.aboveWater = false;
@@ -136,18 +143,21 @@ function scoreCombo(comboScore)
     }
 }
 
+function sharkHitJet(shark, jet) {
+    var destroyed = jets[jet.name].damage();
+    if (destroyed)
+    {
+        jet_explode_sfx.play('explode');
+        score += 1;
+        currentComboScore += 1;
+        if(currentComboScore > maxCombo)
+        {
+            maxCombo = currentComboScore;
+        }
+    }
+}
+
 function render() {
     game.debug.text('Score: ' + score, 32, 32)
     game.debug.text('Max Combo: ' + maxCombo, 32, 64)
-}
-
-function collisionHandler (shark, jet)
-{
-    jet.kill();
-    score += 1;
-    currentComboScore += 1;
-    if(currentComboScore > maxCombo)
-    {
-        maxCombo = currentComboScore;
-    }
 }
