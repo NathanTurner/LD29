@@ -10,6 +10,7 @@ function preload() {
     //images
     game.load.image('shark',    SPRITE_DIR + 'shark.png');
     game.load.image('jet',      SPRITE_DIR + 'jet.png');
+    game.load.image('bomb',     SPRITE_DIR + 'bomb.png');
     game.load.image('waves',    SPRITE_DIR + 'waves.png');
     game.load.atlas('speaker',  SPRITE_DIR + 'speaker.png', null, speakerData);
 
@@ -25,6 +26,7 @@ function preload() {
 var player;
 var jets = [];
 var comboText;
+var hitText;
 var enemyProjectiles;
 var jet_explode_sfx;
 var jetCounter = 0;
@@ -66,40 +68,50 @@ function create() {
     player.anchor.setTo(0.5, 0.5);
     player.scale.setTo(0.3, 0.3);
     player.aboveWater = false;
+    player.health = 100;
 
     game.physics.enable(player, Phaser.Physics.ARCADE);
     player.body.maxVelocity.setTo(300, 1000);
     player.body.drag.set(1);
-    enemyProjectiles = game.add.group();
+
+    bombs = game.add.group();
+    bombs.enableBody = true;
+    bombs.physicsBodyType = Phaser.Physics.ARCADE;
+    bombs.createMultiple(4, 'bomb');
+    
+    bombs.setAll('anchor.x', 0.5);
+    bombs.setAll('anchor.y', 0.5);
+    bombs.setAll('outOfBoundsKill', true);
+    bombs.setAll('checkWorldBounds', true);
 
     game.time.events.repeat(Phaser.Timer.SECOND * 2, 4, createJet, this);
     style = { font: "65px Arial", fill: "#eeddbb", align: "center" };
     comboText = game.add.text(game.world.centerX-80, 128, 'Combo ' + currentComboScore, style);
     comboText.alpha = 0;
     comboText.anchor.setTo(0.5,0.5);
+    hitText = game.add.text(game.world.centerX - 50, 256, "OUCHIES!", style);
+    hitText.alpha = 0;
+    hitText.anchor.setTo(0.5,0.5);
     speaker.bringToTop();
 }
 
 function createJet()
 {
-    jets[jetCounter.toString()] = new Jet(jetCounter, game, player, enemyProjectiles);
+    jets[jetCounter.toString()] = new Jet(jetCounter, game, player, bombs);
     jetCounter++;
 }
 
 function update() {
 
-    for (i in jets)
-    {
-        if (jets[i].alive)
-        {
+    for (i in jets) {
+        if (jets[i].alive) {
             jets[i].update();
             game.physics.arcade.overlap(player, jets[i].jet, sharkHitJet, null, this);
-        }
-        else
-        {
+        } else {
             delete jets[i];
         }
     }
+    game.physics.arcade.overlap(bombs, player, bombHitShark, null, this);
     player.body.angularVelocity = 0;
     if (player.body.y > 300) {
         if (player.aboveWater) {
@@ -172,6 +184,17 @@ function scoreCombo(comboScore)
         game.add.tween(comboText).to({angle: 360}, 2000, Phaser.Easing.Linear.None, true);
         score += (Math.pow(comboScore,2)-currentComboScore)
     }
+}
+
+function bombHitShark(shark, bomb) {
+    bomb.kill();
+    playSound(jet_explode_sfx, '');
+    hitText.alpha = 1;
+    hitText.angle = 0;
+    hitText.setText("OUCHIES!");
+    var style = { font: "75px Arial", fill: "#ff0000", align: "center" };
+    hitText.setStyle(style);
+    game.add.tween(hitText).to({alpha: 0}, 2000, Phaser.Easing.Linear.None, true);
 }
 
 function sharkHitJet(shark, jet) {
