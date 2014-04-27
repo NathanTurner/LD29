@@ -13,6 +13,9 @@ function preload() {
     game.load.image('jet',      SPRITE_DIR + 'jet.png');
     game.load.image('bomb',     SPRITE_DIR + 'bomb.png');
     game.load.image('waves',    SPRITE_DIR + 'waves.png');
+    game.load.image('waves_bg', SPRITE_DIR + 'waves_bg.png');
+    game.load.image('depths',   SPRITE_DIR + 'depths.png');
+    game.load.image('waves_fg', SPRITE_DIR + 'waves_fg.png');
     game.load.image('cloud1',   SPRITE_DIR + 'cloud1.png');
     game.load.image('cloud2',   SPRITE_DIR + 'cloud2.png');
     game.load.image('cloud3',   SPRITE_DIR + 'cloud3.png');
@@ -45,6 +48,7 @@ var currentComboScore = 0;
 var maxCombo = 0;
 var mute = false;
 var numSharks = 5;
+var oceanLayers;
 
 function create() {
     game.stage.backgroundColor = '#3399FF';
@@ -72,12 +76,30 @@ function create() {
     cursors.w = game.input.keyboard.addKey(Phaser.Keyboard.W);
     cursors.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
     cursors.d = game.input.keyboard.addKey(Phaser.Keyboard.D);
-    waves = game.add.tileSprite(0,300,800,300, 'waves');
     for (var i=NUM_CLOUDS; i>0; i--) {
         var cloud_num = Math.ceil(i/4);
         clouds.push([game.add.sprite(game.rnd.integerInRange(0, game.width), game.rnd.integerInRange(0,222), 'cloud' + cloud_num.toString()), cloud_num]);
         clouds[NUM_CLOUDS-i][0].scale.setTo(0.5, 0.5);
     }
+
+    oceanLayers = game.add.group();
+    depths = game.add.tileSprite(0, 383, 800, 342, 'depths');
+    oceanLayers.add(depths);
+    depths.z = 0;
+
+    waves_bg = game.add.tileSprite(0, 290, 800, 84, 'waves_bg');
+    oceanLayers.add(waves_bg);
+    waves_bg.z = 1;
+    game.add.tween(waves_bg).to({y: waves_bg.y - 10}, 1000, Phaser.Easing.Linear.None, true, 0, 1000, true);
+
+    waves_fg = game.add.tileSprite(0, 380, 800, 78, 'waves_fg');
+    oceanLayers.add(waves_fg);
+    waves_fg.z = 2;
+
+    waves = game.add.tileSprite(0, 303, 800, 84, 'waves');
+    oceanLayers.add(waves);
+    waves.z = 3;
+
     player = game.add.sprite(game.world.centerX, game.world.centerY * 3/2, 'shark');
     player.anchor.setTo(0.5, 0.5);
     player.scale.setTo(0.3, 0.3);
@@ -207,6 +229,9 @@ function update() {
         player.body.velocity.x = 0;
         player.body.x = -player.width/2;
     }
+    depths.tilePosition.x -= 2;
+    waves_bg.tilePosition.x -= 3;
+    waves_fg.tilePosition.x -= 4;
     waves.tilePosition.x -= 5;
 
     var part = sharkPath.pop();
