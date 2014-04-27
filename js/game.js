@@ -6,6 +6,7 @@ var SPRITE_DIR = 'assets/sprites/';
 var AUDIO_DIR = 'assets/audio/';
 var SHARK_SPEED = 10;
 var NUM_CLOUDS = 16;
+var EXPLOSION_FRAME_RATE = 6;
 
 function preload() {
     //images
@@ -21,6 +22,7 @@ function preload() {
     game.load.image('cloud3',   SPRITE_DIR + 'cloud3.png');
     game.load.image('cloud4',   SPRITE_DIR + 'cloud4.png');
     game.load.atlas('speaker',  SPRITE_DIR + 'speaker.png', null, speakerData);
+    game.load.spritesheet('explosionFms', SPRITE_DIR + 'explosion_frames.png',180,149,3);
 
     //sound effects
     game.load.audio('jet_explode',      AUDIO_DIR + 'jet_explode.wav');
@@ -62,6 +64,7 @@ function create() {
     music = game.add.audio('bgmusic',1,true);
     music.play('',0,0.3,true);
     speaker = game.add.sprite(game.width - 32, game.height - 32, 'speaker');
+
     speaker.inputEnabled = true;
     speaker.events.onInputDown.add(function() {
         mute = !mute;
@@ -278,13 +281,14 @@ function bombHitShark(shark, bomb) {
         hitText.setText("YOU DEAD!!!");
     }
     game.add.tween(hitText).to({alpha: 0}, delay, Phaser.Easing.Linear.None, true);
+    playExplosion(shark, 60+shark.deltaX, 80+shark.deltaY);
 }
 
 function sharkHitJet(shark, jet) {
     var destroyed = jets[jet.name].damage();
     if (destroyed)
     {
-        playSound(jet_explode_sfx, '');
+        playExplosion(jet, 50, 50);
         score += 1;
         currentComboScore += 1;
         if(currentComboScore > maxCombo)
@@ -292,6 +296,16 @@ function sharkHitJet(shark, jet) {
             maxCombo = currentComboScore;
         }
     }
+}
+
+function playExplosion(obj, offX, offY)
+{
+    playSound(jet_explode_sfx, '');
+    explosion = game.add.sprite(obj.x-offX, obj.y-offY, 'explosionFms');
+    explosion.animations.add("explode");
+    explosion.animations.play("explode", EXPLOSION_FRAME_RATE, false, true);
+
+    explosion.bringToTop();
 }
 
 function render() {
