@@ -14,6 +14,9 @@ function preload() {
 var player;
 var jets;
 var score = 0;
+var currentComboScore = 0;
+var maxCombo = 0;
+var comboText;
 
 function create() {
     game.stage.backgroundColor = '#202040';
@@ -31,6 +34,7 @@ function create() {
     player = game.add.sprite(game.world.centerX, game.world.centerY * 3/2, 'shark');
     player.anchor.setTo(0.5, 0.5);
     player.scale.setTo(0.3, 0.3);
+    player.aboveWater = false;
 
     game.physics.enable(player, Phaser.Physics.ARCADE);
     player.body.maxVelocity.setTo(300, 1000);
@@ -40,6 +44,10 @@ function create() {
     jets.physicsBodyType = Phaser.Physics.ARCADE;
 
     game.time.events.repeat(Phaser.Timer.SECOND * 2, 4, createJet, this);
+    style = { font: "65px Arial", fill: "#eeddbb", align: "center" };
+    comboText = game.add.text(game.world.centerX-80, 128, 'Combo ' + currentComboScore, style);
+    comboText.alpha = 0;
+    comboText.anchor.setTo(0.5,0.5);
 }
 
 function createJet() {
@@ -61,8 +69,10 @@ function createJet() {
 function update() {
     game.physics.arcade.overlap(player, jets, collisionHandler, null, this);
     player.body.angularVelocity = 0;
-    if (player.body.y > 300) {
-        
+    if (player.body.y > 300) { 
+        player.aboveWater = false;
+        scoreCombo(currentComboScore);
+        currentComboScore = 0;
         if (cursors.up.isDown || cursors.w.isDown)
         {
             player.body.velocity.x += game.physics.arcade.velocityFromAngle(player.angle, SHARK_SPEED).x;
@@ -97,6 +107,7 @@ function update() {
     }
     else
     {
+        player.aboveWater = true;
         player.angle += 1 * (player.angle - 75 < 0)
         player.angle += -1 * (player.angle - 75 > 0)
         player.body.velocity.x -= 1;
@@ -110,12 +121,33 @@ function update() {
     ocean.tilePosition.x -= 5;
 }
 
+function scoreCombo(comboScore)
+{
+    if(comboScore > 1)
+    {
+        comboText.alpha = 1;
+        comboText.angle = 0;
+        comboText.setText("Combo: " + comboScore);
+        var style = { font: "65px Arial", fill: "#eeddbb", align: "center" };
+        comboText.setStyle(style);
+        game.add.tween(comboText).to({alpha: 0}, 500*comboScore, Phaser.Easing.Linear.None, true);
+        game.add.tween(comboText).to({angle: 360}, 2000, Phaser.Easing.Linear.None, true);
+        score += (Math.pow(comboScore,2)-currentComboScore)
+    }
+}
+
 function render() {
     game.debug.text('Score: ' + score, 32, 32)
+    game.debug.text('Max Combo: ' + maxCombo, 32, 64)
 }
 
 function collisionHandler (shark, jet)
 {
     jet.kill();
     score += 1;
+    currentComboScore += 1;
+    if(currentComboScore > maxCombo)
+    {
+        maxCombo = currentComboScore;
+    }
 }
