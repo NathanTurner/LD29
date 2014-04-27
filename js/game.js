@@ -9,8 +9,7 @@ var SHARK_SPEED = 10;
 function preload() {
     game.load.image('shark', SPRITE_DIR + 'shark.png');
     game.load.image('jet',   SPRITE_DIR + 'jet.png');
-    game.load.image('water', SPRITE_DIR + 'waves.png');
-
+    game.load.image('waves', SPRITE_DIR + 'waves.png');
     game.load.audio('jet_explode',   AUDIO_DIR + 'jet_explode.wav');
 }
 
@@ -37,8 +36,7 @@ function create() {
     cursors.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
     cursors.d = game.input.keyboard.addKey(Phaser.Keyboard.D);
 
-    ocean = game.add.tileSprite(0,300,800,300, 'water');
-
+    waves = game.add.tileSprite(0,300,800,300, 'waves');
     player = game.add.sprite(game.world.centerX, game.world.centerY * 3/2, 'shark');
     player.anchor.setTo(0.5, 0.5);
     player.scale.setTo(0.3, 0.3);
@@ -125,7 +123,7 @@ function update() {
         player.body.velocity.x = 0;
         player.body.x = -player.width/2;
     }
-    ocean.tilePosition.x -= 5;
+    waves.tilePosition.x -= 5;
 }
 
 function scoreCombo(comboScore)
