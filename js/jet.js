@@ -9,6 +9,7 @@ Jet = function (index, game, shark, bombs) {
     this.alive = true;
     this.jet = game.add.sprite(game.width, 50+game.rnd.integerInRange(0, 200), 'jet');
     this.jet.name = index.toString();
+    this.jet.anchor.setTo(0.5, 0.5);
     game.physics.enable(this.jet, Phaser.Physics.ARCADE);
     game.add.tween(this.jet).to({ x: this.jet.x - 1600 }, 10000, Phaser.Easing.Linear.None, true);
     game.add.tween(this.jet).to({ y: this.jet.y + 20 }, 1000, Phaser.Easing.Linear.None, true, 0, Number.MAX_VALUE, true);
@@ -17,6 +18,15 @@ Jet = function (index, game, shark, bombs) {
         var rT = game.rnd.integerInRange(2,6);
         game.time.events.add(Phaser.Timer.SECOND*rT, createJet, this);
     }, this);
+    this.smokeEmitter = this.game.add.emitter(this.jet.body.x + this.jet.width - 10, this.jet.body.y + this.jet.height / 2 + 10, 1000);
+    this.smokeEmitter.makeParticles('smoke');
+    this.smokeEmitter.maxRotation = 15;
+    this.smokeEmitter.gravity = 0;
+    this.smokeEmitter.setXSpeed(90,150);
+    this.smokeEmitter.setYSpeed(-30,30);
+    this.smokeEmitter.minParticleScale = 0.4;
+    this.smokeEmitter.maxParticleScale = 0.9;
+    this.smokeEmitter.start(false, 300, 10);
 };
 
 Jet.prototype.damage = function() {
@@ -24,8 +34,7 @@ Jet.prototype.damage = function() {
 
     if (this.health <= 0)
     {
-        this.alive = false;
-        this.jet.kill();
+        this.kill();
         return true;
     }
     return false;
@@ -33,10 +42,11 @@ Jet.prototype.damage = function() {
 
 Jet.prototype.update = function() {
     this.delay++;
+    this.smokeEmitter.x = this.jet.body.x + this.jet.width - 10;
+    this.smokeEmitter.y = this.jet.body.y + this.jet.height / 2 + 10;
     if (this.jet.x + this.jet.width < 0)
     {
-        this.alive = false;
-        this.jet.kill();
+        this.kill();
     }
     else if (this.delay > this.nextFire && this.bombs.countDead() > 0)
     {
@@ -46,4 +56,12 @@ Jet.prototype.update = function() {
         bomb.reset(this.jet.body.x + 50, this.jet.body.y + 50);
         this.game.physics.arcade.accelerateToXY(bomb, bomb.x, 1000, 400, 0, 500);
     }
+}
+
+Jet.prototype.kill = function() {
+    this.alive = false;
+    this.jet.kill();
+    this.smokeEmitter.on = false;
+    //this.smokeEmitter.destroy(true);
+    //this.smokeEmitter.kill();
 }
