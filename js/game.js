@@ -61,7 +61,6 @@ function create() {
             music.resume();
         }
     }, this);
-    //speaker.animations.play('toggle', 1, false);
     cursors = game.input.keyboard.createCursorKeys();
     cursors.w = game.input.keyboard.addKey(Phaser.Keyboard.W);
     cursors.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
@@ -126,6 +125,11 @@ function update() {
             game.physics.arcade.overlap(player, jets[i].jet, sharkHitJet, null, this);
         } else {
             delete jets[i];
+        }
+    }
+    for (var i=0; i<bombs.children.length; i++) {
+        if (bombs.getChildAt(i).y > game.world.height + bombs.getChildAt(i).height) {
+            bombs.getChildAt(i).kill();
         }
     }
     game.physics.arcade.overlap(bombs, player, bombHitShark, null, this);
