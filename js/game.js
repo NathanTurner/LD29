@@ -10,7 +10,9 @@ function preload() {
     game.load.image('shark', SPRITE_DIR + 'shark.png');
     game.load.image('jet',   SPRITE_DIR + 'jet.png');
     game.load.image('waves', SPRITE_DIR + 'waves.png');
-    game.load.audio('jet_explode',   AUDIO_DIR + 'jet_explode.wav');
+    game.load.audio('jet_explode',      AUDIO_DIR + 'jet_explode.wav');
+    game.load.audio('jump_out_of_ocean',AUDIO_DIR + 'jump_out_of_ocean.wav');
+    game.load.audio('splash_down',      AUDIO_DIR + 'splash_down.wav');
 }
 
 var player;
@@ -24,13 +26,17 @@ var currentComboScore = 0;
 var maxCombo = 0;
 
 function create() {
-    game.stage.backgroundColor = '#202040';
+    game.stage.backgroundColor = '#3399FF';
     game.physics.startSystem(Phaser.Physics.ARCADE);
     game.world.setBounds(0, 0, 928, 600);
     game.scale.pageAlignHorizontally = true;
     game.scale.refresh();
     jet_explode_sfx = game.add.audio('jet_explode');
     jet_explode_sfx.addMarker('explode', 0, 1.0);
+    shark_jump_sfx = game.add.audio('jump_out_of_ocean');
+    shark_jump_sfx.addMarker('jump', 0, 1.0);
+    splash_sfx = game.add.audio('splash_down');
+    splash_sfx.addMarker('splash', 0, 1.0);
     cursors = game.input.keyboard.createCursorKeys();
     cursors.w = game.input.keyboard.addKey(Phaser.Keyboard.W);
     cursors.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
@@ -74,7 +80,11 @@ function update() {
         }
     }
     player.body.angularVelocity = 0;
-    if (player.body.y > 300) { 
+    if (player.body.y > 300) {
+        if (player.aboveWater)
+        {
+            splash_sfx.play('splash');
+        }
         player.aboveWater = false;
         scoreCombo(currentComboScore);
         currentComboScore = 0;
@@ -102,16 +112,19 @@ function update() {
             player.angle += 1 * (player.angle < 0)
             player.angle += -1 * (player.angle > 0)
         }
-        if (player.body.y + player.height > game.height)
+        if (player.body.y + 20 > game.height)
         {
             player.body.velocity.y = 0;
-            player.body.y = game.height - player.height;
+            player.body.y = game.height - 20;
         }
 
         player.body.velocity.x -= SHARK_SPEED * ((player.body.x + player.width) / 600);
     }
     else
     {
+        if (!player.aboveWater) {
+            shark_jump_sfx.play('jump');
+        }
         player.aboveWater = true;
         player.angle += 1 * (player.angle - 75 < 0)
         player.angle += -1 * (player.angle - 75 > 0)
