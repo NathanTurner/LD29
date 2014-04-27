@@ -60,7 +60,7 @@ function create() {
     shark_jump_sfx = game.add.audio('jump_out_of_ocean', 1);
     splash_sfx = game.add.audio('splash_down', 1);
     music = game.add.audio('bgmusic',1,true);
-    music.play('',0,1,true);
+    music.play('',0,0.3,true);
     speaker = game.add.sprite(game.width - 32, game.height - 32, 'speaker');
     speaker.inputEnabled = true;
     speaker.events.onInputDown.add(function() {
