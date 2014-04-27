@@ -25,6 +25,9 @@ function preload() {
 
 var player;
 var jets = [];
+var sharks = [];
+var sharkPath = [];
+var sharkSpacer = 10;
 var comboText;
 var hitText;
 var enemyProjectiles;
@@ -34,6 +37,7 @@ var score = 0;
 var currentComboScore = 0;
 var maxCombo = 0;
 var mute = false;
+var numSharks = 5;
 
 function create() {
     game.stage.backgroundColor = '#3399FF';
@@ -73,6 +77,19 @@ function create() {
     game.physics.enable(player, Phaser.Physics.ARCADE);
     player.body.maxVelocity.setTo(300, 1000);
     player.body.drag.set(1);
+
+    for (var i=0; i<numSharks; i++) {
+        sharks[i] = game.add.sprite(player.body.x, player.body.y, 'shark');
+        sharks[i].anchor.setTo(0.5, 0.5);
+        var scale = 0.15 + game.rnd.frac() * 0.25;
+        sharks[i].scale.setTo(scale, scale);
+        sharks[i].angSpeed = game.rnd.frac();
+        game.physics.enable(sharks[i], Phaser.Physics.ARCADE);
+    }
+    for (var i=0; i <= numSharks * sharkSpacer; i++)
+    {
+        sharkPath[i] = new Phaser.Point(player.body.x, player.body.y);
+    }
 
     bombs = game.add.group();
     bombs.enableBody = true;
@@ -169,6 +186,16 @@ function update() {
         player.body.x = -player.width/2;
     }
     waves.tilePosition.x -= 5;
+
+    var part = sharkPath.pop();
+    part.setTo(player.body.x, player.body.y);
+    sharkPath.unshift(part);
+    for (var i=0; i<numSharks; i++) {
+        if (sharks[i].angle < player.angle) sharks[i].angle += sharks[i].angSpeed;
+        if (sharks[i].angle > player.angle) sharks[i].angle -= sharks[i].angSpeed;
+        sharks[i].x = (sharkPath[i * sharkSpacer]).x;
+        sharks[i].y = (sharkPath[i * sharkSpacer]).y;
+    }
 }
 
 function scoreCombo(comboScore)
@@ -192,9 +219,18 @@ function bombHitShark(shark, bomb) {
     hitText.alpha = 1;
     hitText.angle = 0;
     hitText.setText("OUCHIES!");
-    var style = { font: "75px Arial", fill: "#ff0000", align: "center" };
+    var delay = 2000;
+    var style = { font: "85px Arial Bold", fill: "#ff0000", align: "center" };
     hitText.setStyle(style);
-    game.add.tween(hitText).to({alpha: 0}, 2000, Phaser.Easing.Linear.None, true);
+    numSharks--;
+    if (numSharks >= 0) {
+        game.physics.arcade.accelerateToXY(sharks[numSharks], -1000, 1000, 400, 0, 500);
+    } else {
+        shark.kill();
+        delay = 10000;
+        hitText.setText("YOU DEAD!!!");
+    }
+    game.add.tween(hitText).to({alpha: 0}, delay, Phaser.Easing.Linear.None, true);
 }
 
 function sharkHitJet(shark, jet) {
