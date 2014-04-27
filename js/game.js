@@ -7,12 +7,18 @@ var AUDIO_DIR = 'assets/audio/';
 var SHARK_SPEED = 10;
 
 function preload() {
+    //images
     game.load.image('shark', SPRITE_DIR + 'shark.png');
     game.load.image('jet',   SPRITE_DIR + 'jet.png');
     game.load.image('waves', SPRITE_DIR + 'waves.png');
+    
+    //sound effects
     game.load.audio('jet_explode',      AUDIO_DIR + 'jet_explode.wav');
     game.load.audio('jump_out_of_ocean',AUDIO_DIR + 'jump_out_of_ocean.wav');
     game.load.audio('splash_down',      AUDIO_DIR + 'splash_down.wav');
+
+    //background music
+    game.load.audio('bgmusic',          AUDIO_DIR + 'bgmusic.wav');
 }
 
 var player;
@@ -31,12 +37,11 @@ function create() {
     game.world.setBounds(0, 0, 928, 600);
     game.scale.pageAlignHorizontally = true;
     game.scale.refresh();
-    jet_explode_sfx = game.add.audio('jet_explode');
-    jet_explode_sfx.addMarker('explode', 0, 1.0);
-    shark_jump_sfx = game.add.audio('jump_out_of_ocean');
-    shark_jump_sfx.addMarker('jump', 0, 1.0);
-    splash_sfx = game.add.audio('splash_down');
-    splash_sfx.addMarker('splash', 0, 1.0);
+    jet_explode_sfx = game.add.audio('jet_explode', 1);
+    shark_jump_sfx = game.add.audio('jump_out_of_ocean', 1);
+    splash_sfx = game.add.audio('splash_down', 1);
+    music = game.add.audio('bgmusic',1,true);
+    music.play('',0,1,true);
     cursors = game.input.keyboard.createCursorKeys();
     cursors.w = game.input.keyboard.addKey(Phaser.Keyboard.W);
     cursors.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
@@ -50,6 +55,7 @@ function create() {
 
     game.physics.enable(player, Phaser.Physics.ARCADE);
     player.body.maxVelocity.setTo(300, 1000);
+    player.body.drag.set(1);
     enemyProjectiles = game.add.group();
 
     game.time.events.repeat(Phaser.Timer.SECOND * 2, 4, createJet, this);
@@ -83,7 +89,7 @@ function update() {
     if (player.body.y > 300) {
         if (player.aboveWater)
         {
-            splash_sfx.play('splash');
+            splash_sfx.play('');
         }
         player.aboveWater = false;
         scoreCombo(currentComboScore);
@@ -123,7 +129,7 @@ function update() {
     else
     {
         if (!player.aboveWater) {
-            shark_jump_sfx.play('jump');
+            shark_jump_sfx.play('');
         }
         player.aboveWater = true;
         player.angle += 1 * (player.angle - 75 < 0)
@@ -158,7 +164,7 @@ function sharkHitJet(shark, jet) {
     var destroyed = jets[jet.name].damage();
     if (destroyed)
     {
-        jet_explode_sfx.play('explode');
+        jet_explode_sfx.play('');
         score += 1;
         currentComboScore += 1;
         if(currentComboScore > maxCombo)
