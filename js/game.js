@@ -5,6 +5,7 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create
 var SPRITE_DIR = 'assets/sprites/';
 var AUDIO_DIR = 'assets/audio/';
 var SHARK_SPEED = 10;
+var NUM_CLOUDS = 16;
 
 function preload() {
     //images
@@ -12,6 +13,10 @@ function preload() {
     game.load.image('jet',      SPRITE_DIR + 'jet.png');
     game.load.image('bomb',     SPRITE_DIR + 'bomb.png');
     game.load.image('waves',    SPRITE_DIR + 'waves.png');
+    game.load.image('cloud1',   SPRITE_DIR + 'cloud1.png');
+    game.load.image('cloud2',   SPRITE_DIR + 'cloud2.png');
+    game.load.image('cloud3',   SPRITE_DIR + 'cloud3.png');
+    game.load.image('cloud4',   SPRITE_DIR + 'cloud4.png');
     game.load.atlas('speaker',  SPRITE_DIR + 'speaker.png', null, speakerData);
 
     //sound effects
@@ -24,6 +29,8 @@ function preload() {
 }
 
 var player;
+
+var clouds = [];
 var jets = [];
 var sharks = [];
 var sharkPath = [];
@@ -65,8 +72,12 @@ function create() {
     cursors.w = game.input.keyboard.addKey(Phaser.Keyboard.W);
     cursors.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
     cursors.d = game.input.keyboard.addKey(Phaser.Keyboard.D);
-
     waves = game.add.tileSprite(0,300,800,300, 'waves');
+    for (var i=NUM_CLOUDS; i>0; i--) {
+        var cloud_num = Math.ceil(i/4);
+        clouds.push([game.add.sprite(game.rnd.integerInRange(0, game.width), game.rnd.integerInRange(0,222), 'cloud' + cloud_num.toString()), cloud_num]);
+        clouds[NUM_CLOUDS-i][0].scale.setTo(0.5, 0.5);
+    }
     player = game.add.sprite(game.world.centerX, game.world.centerY * 3/2, 'shark');
     player.anchor.setTo(0.5, 0.5);
     player.scale.setTo(0.3, 0.3);
@@ -118,7 +129,14 @@ function createJet()
 }
 
 function update() {
-
+    for (var i=0; i<clouds.length; i++) {
+        var cloud = clouds[i];
+        cloud[0].x -= 1 / cloud[1];
+        if (cloud[0].x < -cloud[0].width) {
+            cloud[0].y = game.rnd.integerInRange(0,222);
+            cloud[0].x = game.rnd.integerInRange(game.width, game.width + 200);
+        }
+    }
     for (i in jets) {
         if (jets[i].alive) {
             jets[i].update();
