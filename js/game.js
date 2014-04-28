@@ -1,6 +1,6 @@
 // vim: expandtab:sw=4:ts=4:sts=4
 
-var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game_div', { preload: preload, create: create, update: update });
 
 var SPRITE_DIR = 'assets/sprites/';
 var AUDIO_DIR = 'assets/audio/';
@@ -70,8 +70,6 @@ function create() {
     game.stage.backgroundColor = '#3399FF';
     game.physics.startSystem(Phaser.Physics.ARCADE);
     game.world.setBounds(0, 0, 928, 600);
-    game.scale.pageAlignHorizontally = true;
-    game.scale.refresh();
     jet_explode_sfx = game.add.audio('jet_explode', 1);
     shark_jump_sfx = game.add.audio('jump_out_of_ocean', 1);
     splash_sfx = game.add.audio('splash_down', 1);
