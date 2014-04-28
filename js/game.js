@@ -1,6 +1,6 @@
 // vim: expandtab:sw=4:ts=4:sts=4
 
-var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render });
+var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
 var SPRITE_DIR = 'assets/sprites/';
 var AUDIO_DIR = 'assets/audio/';
@@ -31,6 +31,20 @@ function preload() {
 
     //background music
     game.load.audio('bgmusic',          AUDIO_DIR + 'bgmusic.wav');
+
+    //font
+    WebFontConfig = {
+        google: { families: [ 'Permanent+Marker::latin' ] }
+    };
+    (function() {
+        var wf = document.createElement('script');
+        wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+        '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+        wf.type = 'text/javascript';
+        wf.async = 'true';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(wf, s);
+    })();
 }
 
 var player;
@@ -137,13 +151,15 @@ function create() {
     bombs.setAll('checkWorldBounds', true);
 
     game.time.events.repeat(Phaser.Timer.SECOND * 2, 4, createJet, this);
-    style = { font: "65px Arial", fill: "#eeddbb", align: "center" };
+    style = { font: "18px Permanent Marker", fill: "#660033", align: "center" };
     comboText = game.add.text(game.world.centerX-80, 128, 'Combo ' + currentComboScore, style);
     comboText.alpha = 0;
     comboText.anchor.setTo(0.5,0.5);
     hitText = game.add.text(game.world.centerX - 50, 256, "OUCHIES!", style);
     hitText.alpha = 0;
     hitText.anchor.setTo(0.5,0.5);
+    scoreText = game.add.text(32, 32, 'Score: ' + score, style);
+    comboScoreText = game.add.text(32, 64, 'Max Combo: ' + maxCombo, style);
     speaker.bringToTop();
 }
 
@@ -154,6 +170,8 @@ function createJet()
 }
 
 function update() {
+    scoreText.text = 'Score: ' + score;
+    comboScoreText.text = 'Max Combo: ' + maxCombo;
     for (var i=0; i<clouds.length; i++) {
         var cloud = clouds[i];
         cloud[0].x -= 1 / cloud[1];
@@ -255,7 +273,7 @@ function scoreCombo(comboScore)
         comboText.alpha = 1;
         comboText.angle = 0;
         comboText.setText("Combo: " + comboScore);
-        var style = { font: "65px Arial", fill: "#eeddbb", align: "center" };
+        var style = { font: "65px Permanent Marker", fill: "#eeddbb", align: "center" };
         comboText.setStyle(style);
         game.add.tween(comboText).to({alpha: 0}, 500*comboScore, Phaser.Easing.Linear.None, true);
         game.add.tween(comboText).to({angle: 360}, 1500, Phaser.Easing.Bounce.Out, true);
@@ -270,7 +288,7 @@ function bombHitShark(shark, bomb) {
     hitText.angle = 0;
     hitText.setText("OUCHIES!");
     var delay = 2000;
-    var style = { font: "85px Arial Bold", fill: "#ff0000", align: "center" };
+    var style = { font: "85px Permanent Marker", fill: "#ff0000", align: "center" };
     hitText.setStyle(style);
     numSharks--;
     if (numSharks >= 0) {
@@ -306,11 +324,6 @@ function playExplosion(obj, offX, offY)
     explosion.animations.play("explode", EXPLOSION_FRAME_RATE, false, true);
 
     explosion.bringToTop();
-}
-
-function render() {
-    game.debug.text('Score: ' + score, 32, 32)
-    game.debug.text('Max Combo: ' + maxCombo, 32, 64)
 }
 
 function playSound(sound, marker) {
