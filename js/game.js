@@ -340,7 +340,8 @@ BasicGame.GameStart.prototype = {
         } else {
             shark.kill();
             delay = 10000;
-            game.time.events.add(Phaser.Timer.SECOND * 4, function() {
+            hitText.setText("YOU DEAD!!!");
+            game.time.events.add(Phaser.Timer.SECOND * 5, function() {
                     this.state.start('DeathScreen')
             }, this);
         }
