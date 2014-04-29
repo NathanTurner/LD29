@@ -1,5 +1,6 @@
-Jet = function (index, game, shark, bombs) {
+Jet = function (index, game, shark, bombs, createJet) {
     this.delay = 0
+    this.createJet = createJet
     this.game = game;
     this.health = 1;
     this.shark = shark;
@@ -15,7 +16,7 @@ Jet = function (index, game, shark, bombs) {
     this.jet.scale.setTo(0.3, 0.3);
     this.jet.events.onKilled.add(function() {
         var rT = game.rnd.integerInRange(2,6);
-        game.time.events.add(Phaser.Timer.SECOND*rT, createJet, this);
+        game.time.events.add(Phaser.Timer.SECOND*rT, this.createJet, this);
     }, this);
 };
 
