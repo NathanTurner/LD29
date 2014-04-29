@@ -114,6 +114,8 @@ BasicGame.GameStart = function (game) {
 
 BasicGame.GameStart.prototype = {
     preload: function () {
+    },
+    create: function () {
         this.clouds.length = 0;
         this.sharks.length = 0;
         jets.length = 0;
@@ -121,8 +123,7 @@ BasicGame.GameStart.prototype = {
         this.currentComboScore = 0;
         this.numSharks = 5;
         this.giantJet;
-    },
-    create: function () {
+
         game.stage.backgroundColor = '#3399FF';
         game.physics.startSystem(Phaser.Physics.ARCADE);
         game.world.setBounds(0, 0, 928, 600);
