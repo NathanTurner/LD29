@@ -349,6 +349,7 @@ BasicGame.GameStart.prototype = {
             delay = 10000;
             hitText.setText("YOU DEAD!!!");
 
+            this.giantJet.bringToTop();
             game.time.events.add(Phaser.Timer.SECOND, function() {
                 game.add.tween(this.giantJet).to({x: -2200}, 2000, Phaser.Easing.Linear.None, true, 0, 0);
             }, this);
