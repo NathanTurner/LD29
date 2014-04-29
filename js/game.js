@@ -58,6 +58,7 @@ BasicGame.Boot.prototype = {
 BasicGame.MainMenu = function (game) {
     this.splash_screen;
     this.text;
+    this.shark;
 };
 
 BasicGame.MainMenu.prototype = {
@@ -68,6 +69,10 @@ BasicGame.MainMenu.prototype = {
         this.splash_screen = game.add.sprite(0, 84, 'splash_complete');
         var style = { font: "28px Permanent Marker", fill: "#eeee66", align: "center" };
         this.text = game.add.text(game.width/2-120, game.height-250, 'Press Enter to start!', style);
+        this.text = game.add.text(game.width/2-120, game.height-250, 'Press Enter to start!', style);
+        this.shark = game.add.sprite(-1500, 0, 'shark');
+        this.shark.scale.setTo(4,4);
+        this.shark.bringToTop();
     },
     update: function () {
         if(game.input.keyboard.isDown(Phaser.Keyboard.ENTER))
@@ -76,7 +81,10 @@ BasicGame.MainMenu.prototype = {
         }
     },
     playGame: function () {
-        this.state.start('GameStart');
+        game.add.tween(this.shark).to({x: 1500}, 1500, Phaser.Easing.Linear.None, true, 0, 0);
+        game.time.events.add(Phaser.Timer.SECOND * 1.3, function() {
+                this.state.start('GameStart')
+        }, this);
     }
 };
 
@@ -332,7 +340,9 @@ BasicGame.GameStart.prototype = {
         } else {
             shark.kill();
             delay = 10000;
-            hitText.setText("YOU DEAD!!!");
+            game.time.events.add(Phaser.Timer.SECOND * 4, function() {
+                    this.state.start('DeathScreen')
+            }, this);
         }
         game.add.tween(hitText).to({alpha: 0}, delay, Phaser.Easing.Linear.None, true);
         this.playExplosion(shark, 60+shark.deltaX, 80+shark.deltaY);
@@ -379,6 +389,8 @@ function deathScreen() {
 }
 BasicGame.DeathScreen = function (game) {
     this.splash_screen;
+    this.text;
+    this.shark;
 };
 
 BasicGame.DeathScreen.prototype = {
@@ -387,6 +399,11 @@ BasicGame.DeathScreen.prototype = {
     create: function () {
         this.stage.backgroundColor = 0x112233;
         this.splash_screen = game.add.sprite(0, 84, 'splash_complete');
+        var style = { font: "28px Permanent Marker", fill: "#eeee66", align: "center" };
+        this.text = game.add.text(game.width/2-200, game.height-250, 'You died.\n Press enter for FINGEANCE!', style);
+        this.shark = game.add.sprite(-1500, 0, 'shark');
+        this.shark.scale.setTo(4,4);
+        this.shark.bringToTop();
     },
     update: function () {
         if(game.input.keyboard.isDown(Phaser.Keyboard.ENTER))
@@ -395,7 +412,10 @@ BasicGame.DeathScreen.prototype = {
         }
     },
     restart: function () {
-        this.state.start('GameStart');
+        game.add.tween(this.shark).to({x: 1500}, 1500, Phaser.Easing.Linear.None, true, 0, 0);
+        game.time.events.add(Phaser.Timer.SECOND * 1.3, function() {
+                this.state.start('GameStart')
+        }, this);
     }
 };
 
