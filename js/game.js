@@ -354,6 +354,7 @@ BasicGame.GameStart.prototype = {
                 game.add.tween(this.giantJet).to({x: -2200}, 2000, Phaser.Easing.Linear.None, true, 0, 0);
             }, this);
             game.time.events.add(Phaser.Timer.SECOND * 3, function() {
+                    music.destroy(false);
                     this.state.start('DeathScreen')
             }, this);
         }
