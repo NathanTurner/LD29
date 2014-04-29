@@ -118,6 +118,7 @@ BasicGame.GameStart.prototype = {
         this.score = 0;
         this.currentComboScore = 0;
         this.numSharks = 5;
+        this.giantJet;
     },
     create: function () {
         game.stage.backgroundColor = '#3399FF';
@@ -167,6 +168,10 @@ BasicGame.GameStart.prototype = {
         waves = game.add.tileSprite(0, 303, 800, 84, 'waves');
         oceanLayers.add(waves);
         waves.z = 3;
+
+        this.giantJet = game.add.sprite(1500, 0, 'jet');
+        this.giantJet.scale.setTo(4,4);
+
 
         player = game.add.sprite(game.world.centerX, game.world.centerY * 3/2, 'shark');
         player.anchor.setTo(0.5, 0.5);
@@ -341,7 +346,11 @@ BasicGame.GameStart.prototype = {
             shark.kill();
             delay = 10000;
             hitText.setText("YOU DEAD!!!");
-            game.time.events.add(Phaser.Timer.SECOND * 5, function() {
+
+            game.time.events.add(Phaser.Timer.SECOND, function() {
+                game.add.tween(this.giantJet).to({x: -2200}, 2000, Phaser.Easing.Linear.None, true, 0, 0);
+            }, this);
+            game.time.events.add(Phaser.Timer.SECOND * 3, function() {
                     this.state.start('DeathScreen')
             }, this);
         }
