@@ -4,6 +4,7 @@ var AUDIO_DIR = 'assets/audio/';
 var SHARK_SPEED = 10;
 var NUM_CLOUDS = 16;
 var EXPLOSION_FRAME_RATE = 6;
+var SPLASH_FRAME_RATE = 6;
 
 var BasicGame = {};
 
@@ -23,9 +24,10 @@ BasicGame.Boot.prototype = {
         game.load.image('cloud2',   SPRITE_DIR + 'cloud2.png');
         game.load.image('cloud3',   SPRITE_DIR + 'cloud3.png');
         game.load.image('cloud4',   SPRITE_DIR + 'cloud4.png');
-        game.load.image('splash_complete',   SPRITE_DIR + 'splash_complete.png');
-        game.load.atlas('speaker',  SPRITE_DIR + 'speaker.png', null, speakerData);
-        game.load.spritesheet('explosionFms', SPRITE_DIR + 'explosion_frames.png',180,149,3);
+        game.load.image('splash_complete',    SPRITE_DIR + 'splash_complete.png');
+        game.load.atlas('speaker',            SPRITE_DIR + 'speaker.png', null, speakerData);
+        game.load.spritesheet('explosionFms', SPRITE_DIR + 'explosion_frames.png', 180, 149, 3);
+        game.load.spritesheet('splash',       SPRITE_DIR + 'splash_animation.png', 312, 282, 4);
 
         //sound effects
         game.load.audio('jet_explode',      AUDIO_DIR + 'jet_explode.wav');
@@ -246,7 +248,7 @@ BasicGame.GameStart.prototype = {
         player.body.angularVelocity = 0;
         if (player.body.y > 300) {
             if (player.aboveWater) {
-                this.playSound(splash_sfx,'');
+                this.playSplash(player, false, 0, 0);
             }
             player.aboveWater = false;
             this.scoreCombo(this.currentComboScore);
@@ -286,7 +288,7 @@ BasicGame.GameStart.prototype = {
         else
         {
             if (!player.aboveWater) {
-                this.playSound(shark_jump_sfx, '');
+                this.playSplash(player, true, 0, 0);
             }
             player.aboveWater = true;
             player.angle += 1 * (player.angle - 75 < 0)
@@ -380,13 +382,23 @@ BasicGame.GameStart.prototype = {
     playExplosion: function (obj, offX, offY)
     {
         this.playSound(jet_explode_sfx, '');
-        explosion = game.add.sprite(obj.x-offX, obj.y-offY, 'explosionFms');
+        explosion = game.add.sprite(obj.x - offX, obj.y - offY, 'explosionFms');
         explosion.animations.add("explode");
         explosion.animations.play("explode", EXPLOSION_FRAME_RATE, false, true);
 
         explosion.bringToTop();
     },
-
+    playSplash : function (obj, jumping, offX, offY)
+    {
+        var sfx = jumping ? shark_jump_sfx : splash_sfx;
+        this.playSound(sfx, '');
+        var splash_scale = 0.3;
+        splash_animation = game.add.sprite(obj.x - offX, obj.y - offY, 'splash');
+        splash_animation.x -= splash_animation.width * splash_scale / 2;
+        splash_animation.scale.setTo(splash_scale, splash_scale);
+        splash_animation.animations.add('splishity_splash');
+        splash_animation.animations.play('splishity_splash', SPLASH_FRAME_RATE, false, true);
+    },
     playSound: function (sound, marker) {
         if (!this.mute) {
             sound.play(marker);
