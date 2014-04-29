@@ -134,7 +134,7 @@ BasicGame.GameStart.prototype = {
         }, this);
         cursors = game.input.keyboard.createCursorKeys();
         cursors.w = game.input.keyboard.addKey(Phaser.Keyboard.W);
-        cursors.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
+        cursors.s = game.input.keyboard.addKey(Phaser.Keyboard.S);
         cursors.d = game.input.keyboard.addKey(Phaser.Keyboard.D);
         for (var i=NUM_CLOUDS; i>0; i--) {
             var cloud_num = Math.ceil(i/4);
@@ -238,7 +238,7 @@ BasicGame.GameStart.prototype = {
             player.aboveWater = false;
             this.scoreCombo(this.currentComboScore);
             this.currentComboScore = 0;
-            if (cursors.up.isDown || cursors.w.isDown)
+            if (cursors.right.isDown || cursors.d.isDown)
             {
                 player.body.velocity.x += game.physics.arcade.velocityFromAngle(player.angle, SHARK_SPEED).x;
                 player.body.velocity.y += game.physics.arcade.velocityFromAngle(player.angle, SHARK_SPEED).y;
@@ -250,15 +250,15 @@ BasicGame.GameStart.prototype = {
 
             player.body.velocity.y += player.angle/10;
 
-            if ((cursors.left.isDown || cursors.a.isDown) && player.angle > -45)
+            if ((cursors.up.isDown || cursors.w.isDown) && player.angle > -45)
             {
                 player.body.angularVelocity = -200;
             }
-            else if ((cursors.right.isDown || cursors.d.isDown) && player.angle < 45)
+            else if ((cursors.down.isDown || cursors.s.isDown) && player.angle < 45)
             {
                 player.body.angularVelocity = 200;
             }
-            if (!cursors.right.isDown && !cursors.d.isDown && !cursors.left.isDown && !cursors.a.isDown) {
+            if (!cursors.down.isDown && !cursors.s.isDown && !cursors.up.isDown && !cursors.w.isDown) {
                 player.angle += 1 * (player.angle < 0)
                     player.angle += -1 * (player.angle > 0)
             }
