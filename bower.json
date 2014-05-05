@@ -1,0 +1,7 @@
+{
+  "name": "sharks-vs-jets-fingeance",
+  "version": "0.0.0",
+  "dependencies": {
+    "phaser-official": "2.0.3"
+  }
+}

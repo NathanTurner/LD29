@@ -1,0 +1,14 @@
+body {
+  background-color: #112233;
+  margin: 0;
+  text-align: center;
+  font-family: sans-serif;
+}
+
+#sharks-vs-jets-fingeance {
+  border: 2px solid white;
+  width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  cursor: pointer;
+}
